@@ -12,6 +12,15 @@
 		},
 		{
 			"type": "cargo",
+			"subcommand": "check",
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": "build",
+			"label": "Rust: cargo check - strinfer"
+		},
+		{
+			"type": "cargo",
 			"subcommand": "run",
 			"problemMatcher": [
 				"$rustc"
