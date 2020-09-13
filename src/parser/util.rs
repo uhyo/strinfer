@@ -1,3 +1,4 @@
+use crate::tokenizer::TemplateItem;
 use crate::tokenizer::Token;
 use nom::character::complete::multispace0;
 use nom::combinator::map;
@@ -50,9 +51,17 @@ where
 
 /// Parses keyword.
 pub fn keyword<'a, 'b: 'a>(
-    name: &'a str,
+    _name: &'a str,
 ) -> impl Fn(&'a [Token<'b>]) -> IResult<&'a [Token<'b>], &'a Token<'b>> {
-    predicate(|token| matches!(token, &Token::Keyword(name)))
+    predicate(|token| matches!(token, &Token::Keyword(_name)))
+}
+
+/// Parses hyphenated keyword.
+pub fn hyphened_keyword<'a, 'b: 'a>(
+    _name: &'a str,
+    _suffix: &'a str,
+) -> impl Fn(&'a [Token<'b>]) -> IResult<&'a [Token<'b>], &'a Token<'b>> {
+    predicate(|token| matches!(token, &Token::HyphenedKeyword(_name, _suffix)))
 }
 
 /// Parses identifier.
@@ -67,6 +76,16 @@ pub fn ident<'a, 'b: 'a>(input: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], &'b
 pub fn string_literal<'a, 'b: 'a>(input: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], &'b str> {
     predicate_map(|token| match token {
         Token::StringLiteral(value) => Some(*value),
+        _ => None,
+    })(input)
+}
+
+/// Parses template literal.
+pub fn template_literal<'a, 'b: 'a>(
+    input: &'a [Token<'b>],
+) -> IResult<&'a [Token<'b>], &'a [TemplateItem<'b>]> {
+    predicate_map(|token| match token {
+        Token::TemplateLiteral(items) => Some(&items[..]),
         _ => None,
     })(input)
 }

@@ -6,12 +6,14 @@ use crate::parser::util::keyword;
 use crate::parser::util::token;
 use crate::parser::util::ws;
 use crate::tokenizer::Token;
+use nom::branch::alt;
 use nom::character::complete::alphanumeric1;
 use nom::character::complete::multispace0;
 use nom::character::complete::multispace1;
 use nom::combinator::all_consuming;
 use nom::combinator::map;
 use nom::multi::many0;
+use nom::multi::many1;
 use nom::sequence::tuple;
 use nom::{bytes::complete::tag, IResult};
 
@@ -23,6 +25,13 @@ pub fn parse<'a, 'b: 'a>(tokens: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], Pr
 }
 
 fn parse_statement<'a, 'b: 'a>(code: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], Statement<'b>> {
+    let parser = alt((parse_let_statement, parse_fn_statement));
+    parser(code)
+}
+
+fn parse_let_statement<'a, 'b: 'a>(
+    code: &'a [Token<'b>],
+) -> IResult<&'a [Token<'b>], Statement<'b>> {
     let parser = tuple((
         keyword("let"),
         ident,
@@ -32,4 +41,19 @@ fn parse_statement<'a, 'b: 'a>(code: &'a [Token<'b>]) -> IResult<&'a [Token<'b>]
     ));
     let (input, (_, ident, _, value, _)) = parser(code)?;
     Ok((input, Statement::Let { name: ident, value }))
+}
+
+fn parse_fn_statement<'a, 'b: 'a>(
+    code: &'a [Token<'b>],
+) -> IResult<&'a [Token<'b>], Statement<'b>> {
+    let parser = tuple((
+        keyword("fn"),
+        ident,
+        many1(ident),
+        token(Token::Equal),
+        parse_expression,
+        token(Token::SemiColon),
+    ));
+    let (input, (_, name, args, _, body, _)) = parser(code)?;
+    Ok((input, Statement::Fn { name, args, body }))
 }

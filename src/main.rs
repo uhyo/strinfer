@@ -114,7 +114,7 @@ fn LastDigit Str =
       [Rest, Digit]
     else
       never
-
+;
 "#,
   );
   let (_, tokens) = tokenizer::tokenize(&code).map_err(|err| err.to_owned())?;

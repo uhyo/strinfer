@@ -1,8 +1,11 @@
 use crate::ast::Expression;
 use crate::parser::ident;
+use crate::parser::keyword;
 use crate::parser::token;
+use crate::parser::util::hyphened_keyword;
 use crate::parser::util::predicate_map;
 use crate::parser::util::string_literal;
+use crate::parser::util::template_literal;
 use crate::tokenizer::Token;
 use nom::branch::alt;
 use nom::combinator::map;
@@ -17,7 +20,47 @@ use nom::IResult;
 pub fn parse_expression<'a, 'b: 'a>(
     code: &'a [Token<'b>],
 ) -> IResult<&'a [Token<'b>], Expression<'b>> {
-    parse_union(code)
+    let parser = alt((parse_distribute, parse_ifmatch, parse_union));
+    parser(code)
+}
+
+fn parse_distribute<'a, 'b: 'a>(
+    input: &'a [Token<'b>],
+) -> IResult<&'a [Token<'b>], Expression<'b>> {
+    let parser = tuple((
+        keyword("distribute"),
+        ident,
+        keyword("in"),
+        parse_expression,
+    ));
+    let (input, (_, id, _, body)) = parser(input)?;
+    Ok((
+        input,
+        Expression::Distribute {
+            ident: id,
+            body: Box::new(body),
+        },
+    ))
+}
+
+fn parse_ifmatch<'a, 'b: 'a>(input: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], Expression<'b>> {
+    let parser = tuple((
+        hyphened_keyword("if", "match"),
+        template_literal,
+        keyword("then"),
+        parse_expression,
+        keyword("else"),
+        parse_expression,
+    ));
+    let (input, (_, pattern, _, then_expr, _, else_expr)) = parser(input)?;
+    Ok((
+        input,
+        Expression::IfMatch {
+            pattern: pattern.to_vec(),
+            then_expr: Box::new(then_expr),
+            else_expr: Box::new(else_expr),
+        },
+    ))
 }
 
 fn parse_union<'a, 'b: 'a>(code: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], Expression<'b>> {

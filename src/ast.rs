@@ -1,3 +1,5 @@
+use crate::tokenizer::TemplateItem;
+
 pub type Program<'a> = Vec<Statement<'a>>;
 
 #[derive(Debug)]
@@ -5,6 +7,11 @@ pub enum Statement<'a> {
     Let {
         name: &'a str,
         value: Expression<'a>,
+    },
+    Fn {
+        name: &'a str,
+        args: Vec<&'a str>,
+        body: Expression<'a>,
     },
 }
 
@@ -29,5 +36,15 @@ pub enum Expression<'a> {
     // Union Expression
     Union {
         exprs: Vec<Expression<'a>>,
+    },
+    // Keyword Expressions
+    Distribute {
+        ident: &'a str,
+        body: Box<Expression<'a>>,
+    },
+    IfMatch {
+        pattern: Vec<TemplateItem<'a>>,
+        then_expr: Box<Expression<'a>>,
+        else_expr: Box<Expression<'a>>,
     },
 }
