@@ -116,7 +116,7 @@ fn parse_template_item<'a>(code: &'a str) -> IResult<&'a str, TemplateItem<'a>> 
 fn is_keyword(s: &str) -> bool {
     match s {
         "let" | "fn" => true,
-        "distribute" | "in" | "then" | "else" => true,
+        "distribute" | "in" | "then" | "else" | "with" => true,
         "true" | "false" => true,
         _ => false,
     }

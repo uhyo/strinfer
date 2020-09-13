@@ -110,7 +110,7 @@ let OneDigitPlus = {
 };
 fn LastDigit Str =
   distribute Digit in
-    if-match `[Rest]{Digit}` then
+    if-match Str with `[Rest]{Digit}` then
       [Rest, Digit]
     else
       never
@@ -118,6 +118,7 @@ fn LastDigit Str =
 fn ConcatStr Left Right =
   `{Left}{Right}`
 ;
+
 "#,
   );
   let (_, tokens) = tokenizer::tokenize(&code).map_err(|err| err.to_owned())?;

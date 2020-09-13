@@ -46,17 +46,20 @@ fn parse_distribute<'a, 'b: 'a>(
 fn parse_ifmatch<'a, 'b: 'a>(input: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], Expression<'b>> {
     let parser = tuple((
         hyphened_keyword("if", "match"),
+        parse_expression,
+        keyword("with"),
         template_literal,
         keyword("then"),
         parse_expression,
         keyword("else"),
         parse_expression,
     ));
-    let (input, (_, pattern, _, then_expr, _, else_expr)) = parser(input)?;
+    let (input, (_, target, _, pattern, _, then_expr, _, else_expr)) = parser(input)?;
     Ok((
         input,
         Expression::IfMatch {
             pattern: pattern.to_vec(),
+            target: Box::new(target),
             then_expr: Box::new(then_expr),
             else_expr: Box::new(else_expr),
         },
@@ -69,7 +72,7 @@ fn parse_union<'a, 'b: 'a>(code: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], Ex
         separated_nonempty_list(token(Token::Bar), parse_atomic_expression),
     );
     map(parser, |mut exprs| {
-        if exprs.len() >= 1 {
+        if exprs.len() > 1 {
             Expression::Union { exprs }
         } else {
             exprs.pop().unwrap()

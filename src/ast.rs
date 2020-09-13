@@ -46,6 +46,7 @@ pub enum Expression<'a> {
         body: Box<Expression<'a>>,
     },
     IfMatch {
+        target: Box<Expression<'a>>,
         pattern: Vec<TemplateItem<'a>>,
         then_expr: Box<Expression<'a>>,
         else_expr: Box<Expression<'a>>,
