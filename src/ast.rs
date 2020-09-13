@@ -10,6 +10,13 @@ pub enum Statement<'a> {
 
 #[derive(Debug)]
 pub enum Expression<'a> {
-    StringLiteral { value: &'a str },
-    Union { exprs: Vec<Expression<'a>> },
+    StringLiteral {
+        value: &'a str,
+    },
+    Map {
+        pairs: Vec<(&'a str, Expression<'a>)>,
+    },
+    Union {
+        exprs: Vec<Expression<'a>>,
+    },
 }

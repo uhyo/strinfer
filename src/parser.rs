@@ -7,11 +7,9 @@ use nom::character::complete::multispace0;
 use nom::character::complete::multispace1;
 use nom::combinator::all_consuming;
 use nom::combinator::map;
-use nom::error::ParseError;
 use nom::multi::many0;
 use nom::sequence::tuple;
 use nom::{bytes::complete::tag, IResult};
-use nom::{exact, many0, named};
 
 mod expression;
 mod util;
