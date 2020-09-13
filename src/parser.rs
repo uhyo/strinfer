@@ -12,7 +12,7 @@ use nom::sequence::tuple;
 use nom::{bytes::complete::tag, IResult};
 
 mod expression;
-mod util;
+pub mod util;
 
 pub fn parse<'a>(code: &'a str) -> IResult<&'a str, Program<'a>> {
     all_consuming(many0(ws(parse_statement)))(code)

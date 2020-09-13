@@ -1,5 +1,6 @@
 mod ast;
 mod parser;
+mod tokenizer;
 
 fn main() {
     let code = r#"
@@ -108,12 +109,14 @@ let OneDigitPlus = {
 };
 fn LastDigit Str =
   distribute Digit in
-    if-match `{Rest}[Digit]` then
+    if-match `[Rest]{Digit}` then
       [Rest, Digit]
     else
       never
 
 "#;
+    let tokens = tokenizer::tokenize(code);
+    println!("{:?}", tokens);
     let ast = parser::parse(code);
     println!("{:?}", ast);
 }
