@@ -4,7 +4,6 @@ mod parser;
 fn main() {
     let code = r#"
 let digits = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-let test = { "abc": "def"; };
 let OneDigitPlus = {
     "00": [false, "0"];
     "01": [false, "1"];
@@ -106,7 +105,7 @@ let OneDigitPlus = {
     "97": [true, "6"];
     "98": [true, "7"];
     "99": [true, "8"];
-}
+};
 "#;
     let ast = parser::parse(code);
     println!("{:?}", ast);

@@ -10,12 +10,23 @@ pub enum Statement<'a> {
 
 #[derive(Debug)]
 pub enum Expression<'a> {
+    // Atomic Expressions
     StringLiteral {
         value: &'a str,
+    },
+    BooleanLiteral {
+        value: bool,
+    },
+    Var {
+        name: &'a str,
     },
     Map {
         pairs: Vec<(&'a str, Expression<'a>)>,
     },
+    Tuple {
+        values: Vec<Expression<'a>>,
+    },
+    // Union Expression
     Union {
         exprs: Vec<Expression<'a>>,
     },
