@@ -3,7 +3,7 @@ mod parser;
 
 fn main() {
     let code = r#"
-let digits = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+let Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 let OneDigitPlus = {
     "00": [false, "0"];
     "01": [false, "1"];
@@ -106,6 +106,13 @@ let OneDigitPlus = {
     "98": [true, "7"];
     "99": [true, "8"];
 };
+fn LastDigit Str =
+  distribute Digit in
+    if-match `{Rest}[Digit]` then
+      [Rest, Digit]
+    else
+      never
+
 "#;
     let ast = parser::parse(code);
     println!("{:?}", ast);
