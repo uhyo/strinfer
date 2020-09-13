@@ -16,14 +16,14 @@ use nom::sequence::preceded;
 use nom::sequence::tuple;
 use nom::IResult;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum TemplateItem<'a> {
     Str(&'a str),
     Interpolate(&'a str),
     Infer(&'a str),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Token<'a> {
     Keyword(&'a str),
     HyphenedKeyword(&'a str, &'a str),
