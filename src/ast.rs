@@ -21,6 +21,9 @@ pub enum Expression<'a> {
     StringLiteral {
         value: &'a str,
     },
+    TemplateLiteral {
+        items: Vec<TemplateItem<'a>>,
+    },
     BooleanLiteral {
         value: bool,
     },

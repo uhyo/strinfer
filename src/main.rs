@@ -115,6 +115,9 @@ fn LastDigit Str =
     else
       never
 ;
+fn ConcatStr Left Right =
+  `{Left}{Right}`
+;
 "#,
   );
   let (_, tokens) = tokenizer::tokenize(&code).map_err(|err| err.to_owned())?;

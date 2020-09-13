@@ -82,6 +82,7 @@ fn parse_atomic_expression<'a, 'b: 'a>(
 ) -> IResult<&'a [Token<'b>], Expression<'b>> {
     let parser = alt((
         parse_string_literal,
+        parse_template_literal,
         parse_boolean_literal,
         parse_map,
         parse_tuple,
@@ -107,6 +108,14 @@ fn parse_boolean_literal<'a, 'b: 'a>(
         Token::Keyword("true") => Some(Expression::BooleanLiteral { value: true }),
         Token::Keyword("false") => Some(Expression::BooleanLiteral { value: false }),
         _ => None,
+    })(code)
+}
+
+fn parse_template_literal<'a, 'b: 'a>(
+    code: &'a [Token<'b>],
+) -> IResult<&'a [Token<'b>], Expression<'b>> {
+    map(template_literal, |items| Expression::TemplateLiteral {
+        items: items.to_vec(),
     })(code)
 }
 
