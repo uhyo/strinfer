@@ -119,6 +119,18 @@ fn ConcatStr Left Right =
   `{Left}{Right}`
 ;
 
+fn Add Left Right =
+  if-match Left with "" then Right else
+  if-match Right with "" then Left else
+  if-match LastDigit Left with [LeftRest, LestDigit] then
+    if-match LastDigit Right with [RightRest, RightDigit] then
+      Add2 LeftRest RightRest (ConcatStr LeftDigit RightDigit)
+    else
+      never
+  else
+    never
+;
+
 "#,
   );
   let (_, tokens) = tokenizer::tokenize(&code).map_err(|err| err.to_owned())?;
