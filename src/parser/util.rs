@@ -20,22 +20,24 @@ where
 }
 
 /// Parses one input value that satisfies given predicate.
-pub fn predicate<'a, F>(
+pub fn predicate<'a, 'b: 'a, F>(
     pred: F,
-) -> impl Fn(&'a [Token<'a>]) -> IResult<&'a [Token<'a>], &'a Token<'a>>
+) -> impl Fn(&'a [Token<'b>]) -> IResult<&'a [Token<'b>], &'a Token<'b>>
 where
-    F: Fn(&'a Token<'a>) -> bool,
+    F: Fn(&'a Token<'b>) -> bool,
 {
     move |input| match input.split_first() {
         Some((fst, rest)) if pred(fst) => Ok((rest, fst)),
-        None => Err(nom::Err::Error(make_error(input, ErrorKind::Tag))),
+        _ => Err(nom::Err::Error(make_error(input, ErrorKind::Tag))),
     }
 }
 
 /// Parses one input value that satisfies given predicate.
-pub fn predicate_map<'a, F, R>(mapper: F) -> impl Fn(&'a [Token<'a>]) -> IResult<&'a [Token<'a>], R>
+pub fn predicate_map<'a, 'b: 'a, F, R>(
+    mapper: F,
+) -> impl Fn(&'a [Token<'b>]) -> IResult<&'a [Token<'b>], R>
 where
-    F: Fn(&'a Token<'a>) -> Option<R>,
+    F: Fn(&'a Token<'b>) -> Option<R>,
 {
     move |input| match input.split_first() {
         Some((fst, rest)) => match mapper(fst) {
@@ -47,14 +49,14 @@ where
 }
 
 /// Parses keyword.
-pub fn keyword<'a>(
+pub fn keyword<'a, 'b: 'a>(
     name: &'a str,
-) -> impl Fn(&'a [Token<'a>]) -> IResult<&'a [Token<'a>], &'a Token<'a>> {
+) -> impl Fn(&'a [Token<'b>]) -> IResult<&'a [Token<'b>], &'a Token<'b>> {
     predicate(|token| matches!(token, &Token::Keyword(name)))
 }
 
 /// Parses identifier.
-pub fn ident<'a>(input: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], &'a str> {
+pub fn ident<'a, 'b: 'a>(input: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], &'b str> {
     predicate_map(|token| match token {
         Token::Ident(name) => Some(*name),
         _ => None,
@@ -62,7 +64,7 @@ pub fn ident<'a>(input: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], &'a str> {
 }
 
 /// Parses string literal.
-pub fn string_literal<'a>(input: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], &'a str> {
+pub fn string_literal<'a, 'b: 'a>(input: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], &'b str> {
     predicate_map(|token| match token {
         Token::StringLiteral(value) => Some(*value),
         _ => None,
@@ -70,8 +72,8 @@ pub fn string_literal<'a>(input: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], &'
 }
 
 /// Parses static token.
-pub fn token<'a>(
+pub fn token<'a, 'b: 'a>(
     token: Token<'a>,
-) -> impl Fn(&'a [Token<'a>]) -> IResult<&'a [Token<'a>], &'a Token<'a>> {
+) -> impl Fn(&'a [Token<'b>]) -> IResult<&'a [Token<'b>], &'a Token<'b>> {
     predicate(move |t| t == &token)
 }

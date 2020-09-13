@@ -6,7 +6,6 @@ use nom::character::complete::char;
 use nom::character::complete::none_of;
 use nom::character::complete::one_of;
 use nom::combinator::all_consuming;
-use nom::combinator::flat_map;
 use nom::combinator::map;
 use nom::combinator::map_opt;
 use nom::combinator::opt;

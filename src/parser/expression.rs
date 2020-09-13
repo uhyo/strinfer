@@ -14,11 +14,13 @@ use nom::sequence::preceded;
 use nom::sequence::tuple;
 use nom::IResult;
 
-pub fn parse_expression<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Expression<'a>> {
+pub fn parse_expression<'a, 'b: 'a>(
+    code: &'a [Token<'b>],
+) -> IResult<&'a [Token<'b>], Expression<'b>> {
     parse_union(code)
 }
 
-fn parse_union<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Expression<'a>> {
+fn parse_union<'a, 'b: 'a>(code: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], Expression<'b>> {
     let parser = preceded(
         opt(token(Token::Bar)),
         separated_nonempty_list(token(Token::Bar), parse_atomic_expression),
@@ -32,7 +34,9 @@ fn parse_union<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Expression
     })(code)
 }
 
-fn parse_atomic_expression<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Expression<'a>> {
+fn parse_atomic_expression<'a, 'b: 'a>(
+    code: &'a [Token<'b>],
+) -> IResult<&'a [Token<'b>], Expression<'b>> {
     let parser = alt((
         parse_string_literal,
         parse_boolean_literal,
@@ -43,15 +47,19 @@ fn parse_atomic_expression<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>]
     parser(code)
 }
 
-fn parse_ident<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Expression<'a>> {
+fn parse_ident<'a, 'b: 'a>(code: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], Expression<'b>> {
     map(ident, |res| Expression::Var { name: res })(code)
 }
 
-fn parse_string_literal<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Expression<'a>> {
+fn parse_string_literal<'a, 'b: 'a>(
+    code: &'a [Token<'b>],
+) -> IResult<&'a [Token<'b>], Expression<'b>> {
     map(string_literal, |value| Expression::StringLiteral { value })(code)
 }
 
-fn parse_boolean_literal<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Expression<'a>> {
+fn parse_boolean_literal<'a, 'b: 'a>(
+    code: &'a [Token<'b>],
+) -> IResult<&'a [Token<'b>], Expression<'b>> {
     predicate_map(|token| match token {
         Token::Keyword("true") => Some(Expression::BooleanLiteral { value: true }),
         Token::Keyword("false") => Some(Expression::BooleanLiteral { value: false }),
@@ -59,7 +67,7 @@ fn parse_boolean_literal<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], 
     })(code)
 }
 
-fn parse_map<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Expression<'a>> {
+fn parse_map<'a, 'b: 'a>(code: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], Expression<'b>> {
     let parser = tuple((
         token(Token::OpenBrace),
         many0(tuple((
@@ -78,7 +86,7 @@ fn parse_map<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Expression<'
     })(code)
 }
 
-fn parse_tuple<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Expression<'a>> {
+fn parse_tuple<'a, 'b: 'a>(code: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], Expression<'b>> {
     let parser = tuple((
         token(Token::OpenBracket),
         separated_list(token(Token::Comma), parse_expression),

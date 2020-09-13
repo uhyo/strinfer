@@ -18,11 +18,11 @@ use nom::{bytes::complete::tag, IResult};
 mod expression;
 pub mod util;
 
-pub fn parse<'a>(tokens: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Program<'a>> {
+pub fn parse<'a, 'b: 'a>(tokens: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], Program<'b>> {
     all_consuming(many0(parse_statement))(tokens)
 }
 
-fn parse_statement<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Statement<'a>> {
+fn parse_statement<'a, 'b: 'a>(code: &'a [Token<'b>]) -> IResult<&'a [Token<'b>], Statement<'b>> {
     let parser = tuple((
         keyword("let"),
         ident,
@@ -30,8 +30,6 @@ fn parse_statement<'a>(code: &'a [Token<'a>]) -> IResult<&'a [Token<'a>], Statem
         parse_expression,
         token(Token::SemiColon),
     ));
-    map(parser, |(_, ident, _, value, _)| Statement::Let {
-        name: ident,
-        value,
-    })(code)
+    let (input, (_, ident, _, value, _)) = parser(code)?;
+    Ok((input, Statement::Let { name: ident, value }))
 }

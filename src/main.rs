@@ -2,8 +2,9 @@ mod ast;
 mod parser;
 mod tokenizer;
 
-fn main() {
-  let code = r#"
+fn main() -> anyhow::Result<()> {
+  let code = String::from(
+    r#"
 let Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 let OneDigitPlus = {
     "00": [false, "0"];
@@ -114,9 +115,12 @@ fn LastDigit Str =
     else
       never
 
-"#;
-  let tokens = tokenizer::tokenize(code);
-  println!("{:?}", tokens);
-  let ast = parser::parse(&tokens);
+"#,
+  );
+  let (_, tokens) = tokenizer::tokenize(&code).map_err(|err| err.to_owned())?;
+  // println!("{:?}", tokens);
+  let (_, ast) =
+    parser::parse(&tokens).map_err(|err| err.map_input(|tokens| format!("{:?}", tokens)))?;
   println!("{:?}", ast);
+  Ok(())
 }
